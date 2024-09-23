@@ -4,7 +4,8 @@ export interface PokemonDetails {
     weight: number,
     order: number,
     sprites: Sprites,
-    stats: Stats[]
+    stats: Stats[],
+    types: Types[]
 }
 
 interface Sprites {
@@ -23,4 +24,37 @@ interface Stats {
 interface Stat {
     name: string,
     url: string
+}
+
+interface Types {
+    slot: number,
+    type: Type
+}
+
+interface Type {
+    name: PokemonType,
+    url: string
+}
+
+export enum PokemonType {
+    Normal =  "normal",
+    Fighting = "fighting",
+    Flying = "flying",
+    Poison = "poison",
+    Ground = "ground",
+    Rock = "rock",
+    Bug = "bug",
+    Ghost = "ghost",
+    Steel = "steel",
+    Fire = "fire",
+    Water = "water",
+    Grass = "grass",
+    Electric = "electric",
+    Psychic = "psychic",
+    Ice = "ice",
+    Dragon = "dragon",
+    Dark = "dark",
+    Fairy = "fairy",
+    Stellar = "stellar",
+    Unknown = "unknown",
 }
