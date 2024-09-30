@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import { PokemonResponse } from "@/models/pokemon.interface";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Pokemon, PokemonResponse } from "@/models/pokemon.interface";
 import { PokemonDetails } from "@/models/pokemonDetails.interface";
 
 const baseURL = 'https://pokeapi.co/api/v2'
@@ -27,5 +28,21 @@ export const PokemonClient = {
         else 
             { return requests.get(`pokemon`) }
     },
-    getAPokemon: (nameOrNumber: string): Promise<PokemonDetails> => requests.get(`pokemon/${nameOrNumber}`)
+    getAPokemon: (nameOrNumber: string): Promise<PokemonDetails> => requests.get(`pokemon/${nameOrNumber}`),
+    savePokemonLocal: (pokemon: Pokemon): Promise<void> => {
+        return AsyncStorage.setItem(`@pokemon:${pokemon.url}`, JSON.stringify(pokemon))
+    },
+    removePokemonLocal: (pokemon: Pokemon): Promise<void> => {
+        console.log(pokemon.url)
+        return AsyncStorage.removeItem(`@pokemon:${pokemon.url}`)
+    },
+    getPokemonLocal: async(): Promise<Pokemon[]> => {
+        const keys = await AsyncStorage.getAllKeys()
+        const fetchedKeys = keys.filter((k) => { return k.startsWith('@pokemon:')})
+        const result = await AsyncStorage.multiGet(fetchedKeys)
+
+        return result.map((r) => {
+            return JSON.parse(r[1]) as Pokemon
+        })
+    }
 }

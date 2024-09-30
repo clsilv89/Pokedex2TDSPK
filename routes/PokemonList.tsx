@@ -1,4 +1,11 @@
-import { Image, StyleSheet, Button, View, TextInput, TouchableHighlight, FlatList, Dimensions } from 'react-native';
+import { StyleSheet, 
+  Button, 
+  View, 
+  TextInput, 
+  TouchableHighlight, 
+  FlatList,
+  Dimensions,
+  Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState, useEffect } from 'react';
 import { PokemonClient } from '@/client/client';
@@ -12,17 +19,42 @@ export default function PokemonList({navigation}) {
 
   useEffect(() => {
     fetchPokemons()
+    fetchFavoritePokemon()
   }, [])
 
   async function fetchPokemons(path?: string) {
     const response = await PokemonClient.getPokemons(path)
     setPokemonList(pokemonList => [...pokemonList, ...response.results])
-    console.log(response.next)
     setNext(response.next ?? '')
   }
 
   async function clear() {
     fetchPokemons()
+  }
+
+  function favoritePokemon(pokemon: Pokemon) {
+    Alert.alert(
+      "Favoritar",
+      `Tem certeza de que gostaria de favoritar ${pokemon.name}`,
+      [
+        {
+          text: "Não",
+          onPress: () => {}
+        },
+        {
+          text: "Sim",
+          onPress: () => {
+            console.log(pokemon)
+            PokemonClient.savePokemonLocal(pokemon)
+          }
+        }
+      ]
+    )
+  }
+
+  async function fetchFavoritePokemon() {
+    const result = await PokemonClient.getPokemonLocal()
+    console.log(result)
   }
 
   return (
@@ -51,8 +83,10 @@ export default function PokemonList({navigation}) {
             ((pokemonDetails) => {
                 return (
                   <>
-                    <TouchableHighlight onPress={() =>
-                            navigation.navigate('Pokemon details', {name: pokemonDetails.item.name})
+                    <TouchableHighlight 
+                        onLongPress={() => favoritePokemon(pokemonDetails.item)}
+                        onPress={() =>
+                          navigation.navigate('Pokemon details', {name: pokemonDetails.item.name})
                         }>
                       <PokemonComponent {...pokemonDetails.item} />
                     </TouchableHighlight>
